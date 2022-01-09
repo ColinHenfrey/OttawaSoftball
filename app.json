@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "OttawaSoftball",
+    "name": "Ottawa Softball",
     "slug": "OttawaSoftball",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,6 +17,8 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.colin.ottawasoftball",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
@@ -27,6 +29,7 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "An app for Ottawasoftball players"
   }
 }
