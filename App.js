@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useMemo, useState } from "react";
 import UserContext from "./context/UserContext";
 import HomeNav from "./screens/HomeNav";
+import Inning from "./screens/Inning";
 
 export default function App() {
 
@@ -24,12 +25,15 @@ export default function App() {
 
     useEffect( () => {
         AsyncStorage.setItem('userID', JSON.stringify(userID))
+        console.log('Set user ID to ' + JSON.stringify(userID))
     }, [userID] )
+
 
     return (
         <UserContext.Provider value={value}>
             <NavigationContainer>
-                {(!userID || userID === '') ? <LoginNav /> : <HomeNav/>}
+                {(!userID || userID === '' || userID === "") ? <LoginNav /> : <HomeNav/>}
+                {/*<Inning/>*/}
                 <StatusBar/>
             </NavigationContainer>
         </UserContext.Provider>

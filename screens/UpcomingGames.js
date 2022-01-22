@@ -13,7 +13,7 @@ export default function UpcomingGames({ navigation }) {
 
     const getGames = async () => {
         try {
-            const response = await fetch('http://192.168.1.121:8000/games?teamID=' + 1)
+            const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/games?teamID=' + 1)
                 .then(res => {
                 if(!res.ok) {
                     return res.text().then(text => { throw new Error(text) })
@@ -26,7 +26,6 @@ export default function UpcomingGames({ navigation }) {
                     console.log(err);
                 });
             setGames(response.games)
-            console.log(response.games)
         } catch (error) {
             console.error(error);
         }

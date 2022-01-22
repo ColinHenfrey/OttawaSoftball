@@ -13,7 +13,7 @@ export default function CreateAccount() {
 
     const createAccount = async () => {
         try {
-            const response = await fetch('http://192.168.1.121:8000/user', {
+            const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/user', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -37,7 +37,7 @@ export default function CreateAccount() {
                     console.log(err);
                 });
             console.log(response.userID)
-            setUserID(response.userID)
+            setUserID(JSON.stringify(response.userID))
         } catch (error) {
             console.error(error);
         }

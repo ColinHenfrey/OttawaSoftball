@@ -10,7 +10,7 @@ export default function Login({ navigation }) {
 
     const login = async () => {
       try {
-        const response = await fetch('http://192.168.1.121:8000/login', {
+        const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/login', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -31,7 +31,7 @@ export default function Login({ navigation }) {
             .catch(err => {
               console.log(err);
             });
-          setUserID(response.userID)
+          setUserID(JSON.stringify(response.userID))
       } catch (error) {
         console.error(error);
       }
