@@ -8,7 +8,7 @@ export default function Game({route, navigation}) {
     return (
         <View style={styles.container}>
             <Text>{`${game.home} vs ${game.away}`}</Text>
-            <Button title='Keep Score' onPress={() => navigation.navigate('Inning', game)}/>
+            <Button title='Keep Score' onPress={() => navigation.navigate('Keep Score', game)}/>
         </View>
     )
 }

@@ -1,7 +1,7 @@
-import {FlatList, View, Text, StyleSheet, Pressable, Button} from "react-native";
-import colors from "react-native/Libraries/NewAppScreen/components/Colors";
+import {FlatList, View, Text, StyleSheet, Pressable, Button, PanResponder, Animated} from "react-native";
 import UserContext from "../context/UserContext";
-import {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
+import globalStyles from '../styles'
 
 export default function UpcomingGames({ navigation }) {
     const { userID, setUserID } = useContext(UserContext);
@@ -31,13 +31,11 @@ export default function UpcomingGames({ navigation }) {
         }
     }
 
-    const keyExtractor = (item, index) => index.toString()
-
     return (
         <View>
             <Text>{`Welcome user ${userID}`}</Text>
             <FlatList
-                keyExtractor={keyExtractor}
+                keyExtractor={(item => item.ID.toString())}
                 data={games}
                 renderItem={(item) => UpcomingGameListItem(item, navigation)}
             />
@@ -49,7 +47,7 @@ export default function UpcomingGames({ navigation }) {
 function UpcomingGameListItem({ item }, navigation) {
     return (
         <Pressable onPress={() => navigation.navigate('Game', {game: item})}>
-            <View style={styles.item}>
+            <View style={globalStyles.item}>
                 <Text>{item.ID}</Text>
             </View>
         </Pressable>
@@ -60,13 +58,5 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 22
-    },
-    item: {
-        padding: 10,
-        fontSize: 18,
-        height: 44,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.light,
-        backgroundColor: colors.white
-    },
+    }
 });

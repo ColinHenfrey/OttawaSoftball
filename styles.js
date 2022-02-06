@@ -1,4 +1,5 @@
 import {StyleSheet} from "react-native";
+import colors from "react-native/Libraries/NewAppScreen/components/Colors";
 
 export default StyleSheet.create({
     container: {
@@ -14,5 +15,17 @@ export default StyleSheet.create({
         borderWidth: 1,
         padding: 10,
         borderRadius: 10
+    },
+    error: {
+        color: 'red',
+        fontWeight: 'bold'
+    },
+    item: {
+        padding: 10,
+        fontSize: 18,
+        height: 44,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.light,
+        backgroundColor: colors.white
     },
 });

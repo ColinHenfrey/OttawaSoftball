@@ -8,6 +8,11 @@ import { useEffect, useMemo, useState } from "react";
 import UserContext from "./context/UserContext";
 import HomeNav from "./screens/HomeNav";
 import Inning from "./screens/Inning";
+import BattingOrder from "./screens/BattingOrder";
+import { SafeAreaView } from "react-native";
+import Viewport from "./screens/test";
+import styles from "./styles";
+import {View} from "react-native";
 
 export default function App() {
 
@@ -19,25 +24,28 @@ export default function App() {
 
     useEffect(async () => {
         let userID = await AsyncStorage.getItem('userID')
-        setUserID(userID ? userID : '')
+        setUserID(!userID || userID.includes("\\") ? '' : JSON.parse(userID))
     }, []);
 
 
     useEffect( () => {
-        AsyncStorage.setItem('userID', JSON.stringify(userID))
-        console.log('Set user ID to ' + JSON.stringify(userID))
+        // AsyncStorage.setItem('userID', "1")
+        console.log('Set user ID to ' + userID)
     }, [userID] )
 
 
     return (
         <UserContext.Provider value={value}>
             <NavigationContainer>
-                {(!userID || userID === '' || userID === "") ? <LoginNav /> : <HomeNav/>}
+                {/*{(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeNav/>}*/}
                 {/*<Inning/>*/}
+                <BattingOrder/>
+                {/*<Inning />*/}
                 <StatusBar/>
             </NavigationContainer>
         </UserContext.Provider>
     )
+
 }
 
 

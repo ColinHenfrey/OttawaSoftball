@@ -1,4 +1,4 @@
-import {Button, TextInput, View} from "react-native";
+import {Button, TextInput, View, Text} from "react-native";
 import styles from "../styles";
 import {useContext, useState} from "react";
 import UserContext from "../context/UserContext";
@@ -6,10 +6,12 @@ import UserContext from "../context/UserContext";
 export default function Login({ navigation }) {
     const [email, onChangeEmail] = useState(null);
     const [password, onChangePassword] = useState(null);
+    const [message, setMessage] = useState(null);
     const { setUserID } = useContext(UserContext);
 
     const login = async () => {
       try {
+        setMessage(null)
         const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/login', {
             method: 'POST',
             headers: {
@@ -30,8 +32,11 @@ export default function Login({ navigation }) {
             })
             .catch(err => {
               console.log(err);
+              setMessage(err.message)
             });
-          setUserID(JSON.stringify(response.userID))
+        if (response?.userID) {
+            setUserID(JSON.stringify(response.userID))
+        }
       } catch (error) {
         console.error(error);
       }
@@ -52,6 +57,7 @@ export default function Login({ navigation }) {
             placeholder={"Password"}
             secureTextEntry={true}
         />
+          {message && <Text style={styles.error}>{message}</Text>}
         <Button onPress= {login} title={'Login'}/>
         <Button title='Create account' onPress={() => navigation.navigate('Create Account')}/>
       </View>
