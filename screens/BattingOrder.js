@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import {Text, View, StyleSheet, TouchableOpacity, Button} from "react-native";
 import DraggableFlatList, {
     ScaleDecorator,
 } from "react-native-draggable-flatlist";
@@ -27,7 +27,7 @@ export default function BattingOrder() {
                 });
             setTeamMembers(response.teamMembers?.map((teamMember) => {
                 return {
-                    key: teamMember.userID,
+                    userID: teamMember.userID,
                     label: `${teamMember.firstName} ${teamMember.lastName}` ,
                     backgroundColor: 'white'
                 };
@@ -55,15 +55,45 @@ export default function BattingOrder() {
         );
     };
 
+    const setBattingOrder = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/teamMembers?teamID=' + 1, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'battingOrder': teamMembers,
+                })
+            })
+                .then(res => {
+                    if(!res.ok) {
+                        return res.text().then(text => { throw new Error(text) })
+                    }
+                    else {
+                        return res.json();
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            console.log(response.message)
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text>Set your batting order</Text>
             <DraggableFlatList
                 data={teamMembers}
                 onDragEnd={({ data }) => setTeamMembers(data)}
-                keyExtractor={(item) => item.key}
+                keyExtractor={(item) => item.userID}
                 renderItem={renderItem}
             />
+            <Button onPress={setBattingOrder} title="Submit Batting Order"/>
         </View>
     );
 }
@@ -83,7 +113,5 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        // alignItems: 'center',
-        marginTop: 100
     }
 });

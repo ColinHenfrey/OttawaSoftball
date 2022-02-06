@@ -29,7 +29,7 @@ export default function App() {
 
 
     useEffect( () => {
-        // AsyncStorage.setItem('userID', "1")
+        AsyncStorage.setItem('userID', JSON.stringify(userID))
         console.log('Set user ID to ' + userID)
     }, [userID] )
 
@@ -37,10 +37,8 @@ export default function App() {
     return (
         <UserContext.Provider value={value}>
             <NavigationContainer>
-                {/*{(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeNav/>}*/}
-                {/*<Inning/>*/}
-                <BattingOrder/>
-                {/*<Inning />*/}
+                {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeNav/>}
+                {/*<HomeNav />*/}
                 <StatusBar/>
             </NavigationContainer>
         </UserContext.Provider>

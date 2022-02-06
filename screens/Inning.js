@@ -83,11 +83,9 @@ export default class Inning extends Component{
                     }}/>
                 </View>
 
-                {/*<View style={{...this.state.dropZonePosition, backgroundColor: 'red', width: RELEASE_RADIUS*2, height: RELEASE_RADIUS*2, borderRadius: RELEASE_RADIUS}} />*/}
+                <View style={{...this.state.dropZonePosition, backgroundColor: 'red', width: RELEASE_RADIUS*2, height: RELEASE_RADIUS*2, borderRadius: RELEASE_RADIUS}} />
 
                 <Player {...this.state} name='CH'/>
-                <Player {...this.state} name='MH'/>
-
 
             </View>
         );
@@ -169,13 +167,18 @@ class Player extends Component{
         return (gesture.moveY - base.y) ** 2 + (gesture.moveX - base.x) ** 2 <= RELEASE_RADIUS ** 2;
     }
 
-    render(){
+    componentDidUpdate() {
         if (this.state.position.top === 0 && this.props?.homeBasePosition?.x != null) {
             this.setState({
                 position: {top: this.props.homeBasePosition.y  - PLAYER_RADIUS,
                     left: this.props.homeBasePosition.x  - PLAYER_RADIUS}
             })
         }
+        console.log('STATE = ')
+        console.log(this.state)
+    }
+
+    render(){
         return (
             <View style={{...styles.draggableContainer, ...this.state.position}}>
                 <Animated.View
@@ -217,7 +220,8 @@ let styles = StyleSheet.create({
         backgroundColor     : '#1abc9c',
         width               : PLAYER_RADIUS*2,
         height              : PLAYER_RADIUS*2,
-        borderRadius        : PLAYER_RADIUS
+        borderRadius        : PLAYER_RADIUS,
+        position: "absolute"
     },
     first: {bottom: 0, right: 0},
     second: {top: 0, right: 0},
@@ -257,12 +261,6 @@ const shapes = StyleSheet.create({
         textAlign   : 'center',
         color       : '#fff'
     },
-    circle      : {
-        backgroundColor     : '#1abc9c',
-        width               : PLAYER_RADIUS*2,
-        height              : PLAYER_RADIUS*2,
-        borderRadius        : PLAYER_RADIUS
-    }
 });
 
 
