@@ -2,6 +2,7 @@ import {FlatList, View, Text, StyleSheet, Pressable, Button, PanResponder, Anima
 import UserContext from "../context/UserContext";
 import React, {useContext, useEffect, useState} from "react";
 import globalStyles from '../styles'
+import Moment from "moment/moment";
 
 export default function UpcomingGames({ navigation }) {
     const { userID, setUserID } = useContext(UserContext);
@@ -25,7 +26,7 @@ export default function UpcomingGames({ navigation }) {
                 .catch(err => {
                     console.log(err);
                 });
-            setGames(response.games)
+            setGames(response?.games)
         } catch (error) {
             console.error(error);
         }
@@ -44,19 +45,43 @@ export default function UpcomingGames({ navigation }) {
     )
 }
 
+function formatDate(date) {
+    return `${date.toLocaleString('en-us', {month:'long', day: 'short'})} `
+}
+
 function UpcomingGameListItem({ item }, navigation) {
+    let moment = Moment(item.date)
+
     return (
         <Pressable onPress={() => navigation.navigate('Game', {game: item})}>
             <View style={globalStyles.item}>
-                <Text>{item.ID}</Text>
+                <View style={{flexDirection: "column", flex: 1}}>
+                    <Text style={{flex: 1}}>{item.fieldName}</Text>
+                    <Text style={{flex: 1}}>{moment.format('MMMM Do [at] h:mm')}</Text>
+                </View>
+                <View style={{flex: 1, textAlign:'right', justifyContent: 'center'}}>
+                    <Text>{`${item.home} vs ${item.away}`}</Text>
+                </View>
             </View>
         </Pressable>
     )
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 22
+    },
+    right: {
+       textAlign: "right"
+    },
+    left: {
+        textAlign: "left"
+    },
+    textStyle:{
+        fontSize: 25,
+        color:'white',
+        flex:1
     }
 });

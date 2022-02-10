@@ -4,7 +4,7 @@ import DraggableFlatList, {
     ScaleDecorator,
 } from "react-native-draggable-flatlist";
 
-export default function BattingOrder() {
+export default function BattingOrder({navigation}) {
     const [ teamMembers, setTeamMembers ] = useState([]);
 
     useEffect(async () => {
@@ -37,27 +37,10 @@ export default function BattingOrder() {
         }
     }
 
-    const renderItem = ({ item, drag, isActive }) => {
-        return (
-            <ScaleDecorator>
-                <TouchableOpacity
-                    onLongPress={drag}
-                    disabled={isActive}
-                    delayLongPress={300}
-                    style={[
-                        styles.rowItem,
-                        { backgroundColor: isActive ? "#F5F5F5" : item.backgroundColor },
-                    ]}
-                >
-                    <Text style={styles.text}>{item.label}</Text>
-                </TouchableOpacity>
-            </ScaleDecorator>
-        );
-    };
-
     const setBattingOrder = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/teamMembers?teamID=' + 1, {
+            console.log(teamMembers)
+            const response = await fetch('http://192.168.1.81:8000/teamMembers?teamID=' + 1, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -84,6 +67,24 @@ export default function BattingOrder() {
         }
     }
 
+    const renderItem = ({ item, drag, isActive }) => {
+        return (
+            <ScaleDecorator>
+                <TouchableOpacity
+                    onLongPress={drag}
+                    disabled={isActive}
+                    delayLongPress={300}
+                    style={[
+                        styles.rowItem,
+                        { backgroundColor: isActive ? "#F5F5F5" : item.backgroundColor },
+                    ]}
+                >
+                    <Text style={styles.text}>{item.label}</Text>
+                </TouchableOpacity>
+            </ScaleDecorator>
+        );
+    };
+
     return (
         <View style={styles.container}>
             <Text>Set your batting order</Text>
@@ -93,7 +94,9 @@ export default function BattingOrder() {
                 keyExtractor={(item) => item.userID}
                 renderItem={renderItem}
             />
-            <Button onPress={setBattingOrder} title="Submit Batting Order"/>
+            <Button onPress={() => {
+                setBattingOrder().then(navigation.navigate('Keep Score'))
+            }} title="Submit Batting Order"/>
         </View>
     );
 }
@@ -101,7 +104,7 @@ export default function BattingOrder() {
 const styles = StyleSheet.create({
     rowItem: {
         height: 100,
-        width: 'max',
+        width: '100%',
         alignItems: "center",
         justifyContent: "center",
     },

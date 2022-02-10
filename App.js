@@ -10,9 +10,10 @@ import HomeNav from "./screens/HomeNav";
 import Inning from "./screens/Inning";
 import BattingOrder from "./screens/BattingOrder";
 import { SafeAreaView } from "react-native";
-import Viewport from "./screens/test";
 import styles from "./styles";
 import {View} from "react-native";
+import InningTest from "./screens/InningTest";
+import Game from "./screens/Game";
 
 export default function App() {
 
@@ -39,6 +40,10 @@ export default function App() {
             <NavigationContainer>
                 {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeNav/>}
                 {/*<HomeNav />*/}
+                {/*<BattingOrder />*/}
+                {/*<Inning />*/}
+                {/*<InningTest />*/}
+                {/*<Game />*/}
                 <StatusBar/>
             </NavigationContainer>
         </UserContext.Provider>

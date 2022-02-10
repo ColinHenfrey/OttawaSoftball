@@ -21,9 +21,11 @@ export default StyleSheet.create({
         fontWeight: 'bold'
     },
     item: {
+        flexDirection: "row",
+        justifyContent: 'center',
         padding: 10,
         fontSize: 18,
-        height: 44,
+        height: 60,
         borderBottomWidth: 1,
         borderBottomColor: colors.light,
         backgroundColor: colors.white

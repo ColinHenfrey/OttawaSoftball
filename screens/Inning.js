@@ -1,5 +1,6 @@
 import {Text, View, StyleSheet, Button, LogBox, Animated, PanResponder, Dimensions} from "react-native";
 import React, {Component} from "react";
+import { Header } from 'react-navigation-stack';
 
 
 export default class Inning extends Component{
@@ -15,9 +16,10 @@ export default class Inning extends Component{
     }
 
     setFirstBaseDropZoneValue(position){
+        console.log('first base position: ', position)
         this.setState({
             firstBasePosition : position,
-            dropZonePosition: {position: "absolute", top: position.y - RELEASE_RADIUS, left: position.x - RELEASE_RADIUS}
+            dropZonePosition: {position: "absolute", top: position.y - RELEASE_RADIUS - 100, left: position.x - RELEASE_RADIUS}
         });
     }
 
@@ -47,6 +49,7 @@ export default class Inning extends Component{
                     <View style={{...shapes.base, ...styles.first}} onLayout={(event) => {
                         event.target.measure(
                             (x, y, width, height, pageX, pageY) => {
+                                console.log('first: ', pageY, height)
                                 this.setFirstBaseDropZoneValue({
                                     x: pageX + width/2,
                                     y: pageY + height/2,
@@ -58,34 +61,33 @@ export default class Inning extends Component{
                         event.target.measure(
                             (x, y, width, height, pageX, pageY) => {
                                 this.setSecondBaseDropZoneValue({
-                                x: pageX + width/2,
-                                y: pageY + height/2,
-                            })},
+                                    x: pageX + width/2,
+                                    y: pageY + height/2,
+                                })},
                         );
                     }}/>
                     <View style={{...shapes.base, ...styles.third}} onLayout={(event) => {
                         event.target.measure(
                             (x, y, width, height, pageX, pageY) => {
                                 this.setThirdBaseDropZoneValue({
-                                x: pageX + width/2,
-                                y: pageY + height/2,
-                            })},
+                                    x: pageX + width/2,
+                                    y: pageY + height/2,
+                                })},
                         );
-                    }}/>
+                    }} onPress={() => this.props.navigation.navigate('Home')}/>
                     <View style={{...shapes.base, ...styles.home}} onLayout={(event) => {
                         event.target.measure(
                             (x, y, width, height, pageX, pageY) => {
                                 this.setHomeBaseDropZoneValue({
-                                x: pageX + width/2,
-                                y: pageY + height/2,
-                            })},
+                                    x: pageX + width/2,
+                                    y: pageY + height/2,
+                                })},
                         );
                     }}/>
                 </View>
 
-                <View style={{...this.state.dropZonePosition, backgroundColor: 'red', width: RELEASE_RADIUS*2, height: RELEASE_RADIUS*2, borderRadius: RELEASE_RADIUS}} />
-
                 <Player {...this.state} name='CH'/>
+                {/*<View style={{width: 20, height: 20, left: 262, top: 354, position: "absolute", backgroundColor: 'red'}}/>*/}
 
             </View>
         );
@@ -127,7 +129,6 @@ class Player extends Component{
                         position: playerPosition.position
                     })
                     });
-
                 }
         });
     }
@@ -135,10 +136,12 @@ class Player extends Component{
     getPlayerPosition(gesture) {
 
         if (this.isInBounds(gesture, this.props.firstBasePosition)) {
+            console.log('dropped in first base position: ', this.props.firstBasePosition.x - PLAYER_RADIUS,
+                this.props.firstBasePosition.y - PLAYER_RADIUS)
             return {
                 base : 'first',
                 position: {left: this.props.firstBasePosition.x - PLAYER_RADIUS,
-                    top: this.props.firstBasePosition.y - PLAYER_RADIUS},
+                    top: this.props.firstBasePosition.y - PLAYER_RADIUS },
             };
         } else if (this.isInBounds(gesture, this.props.secondBasePosition)) {
             return {
@@ -156,7 +159,7 @@ class Player extends Component{
             return {
                 base : 'home',
                 position: {left: this.props.homeBasePosition.x - PLAYER_RADIUS,
-                    top: this.props.homeBasePosition.y - PLAYER_RADIUS}
+                    top: this.props.homeBasePosition.y - PLAYER_RADIUS }
             };
         } else {
             return {base: this.state.base, position: this.state.position}
@@ -170,12 +173,10 @@ class Player extends Component{
     componentDidUpdate() {
         if (this.state.position.top === 0 && this.props?.homeBasePosition?.x != null) {
             this.setState({
-                position: {top: this.props.homeBasePosition.y  - PLAYER_RADIUS,
+                position: {top: this.props.homeBasePosition.y  - PLAYER_RADIUS ,
                     left: this.props.homeBasePosition.x  - PLAYER_RADIUS}
             })
         }
-        console.log('STATE = ')
-        console.log(this.state)
     }
 
     render(){
@@ -198,6 +199,9 @@ let Window = Dimensions.get('window');
 let styles = StyleSheet.create({
     mainContainer: {
         flex    : 1,
+        justifyContent: "center",
+        position: "relative",
+        alignItems: "center"
     },
     dropZone    : {
         height  : 100,
@@ -215,6 +219,7 @@ let styles = StyleSheet.create({
     },
     draggableContainer: {
         position    : 'absolute',
+        flex: 1
     },
     circle      : {
         backgroundColor     : '#1abc9c',
@@ -235,8 +240,6 @@ const shapes = StyleSheet.create({
     field: {
         width: FIELD_LENGTH,
         height: FIELD_LENGTH,
-        left: Window.width/2 - FIELD_LENGTH/2,
-        top : Window.height/2 - FIELD_LENGTH/2,
         backgroundColor: "green",
         transform: [{ rotate: "-45deg" }],
     },
