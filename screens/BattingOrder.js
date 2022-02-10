@@ -40,7 +40,7 @@ export default function BattingOrder({navigation}) {
     const setBattingOrder = async () => {
         try {
             console.log(teamMembers)
-            const response = await fetch('http://192.168.1.81:8000/teamMembers?teamID=' + 1, {
+            const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/teamMembers?teamID=' + 1, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
