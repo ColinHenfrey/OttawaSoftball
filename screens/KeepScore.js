@@ -4,7 +4,7 @@ import {useContext, useEffect, useState} from "react";
 import UserContext from "../context/UserContext";
 
 
-export default function KeepScore({navigation}) {
+export default function KeepScore({route, navigation}) {
     const [ innings, setInnings ] = useState([]);
 
     useEffect(async () => {
@@ -25,8 +25,7 @@ export default function KeepScore({navigation}) {
                 .catch(err => {
                     console.log(err);
                 });
-            console.log(response.innings)
-            setInnings(response.innings)
+            setInnings(response?.innings)
         } catch (error) {
             console.error(error);
         }
@@ -37,15 +36,15 @@ export default function KeepScore({navigation}) {
             <FlatList
                 keyExtractor={(item) => (item.gameID.toString() + item.number.toString())}
                 data={innings}
-                renderItem={(item) => InningListItem(item, navigation)}
+                renderItem={(item) => InningListItem(item, navigation, route)}
             />
         </View>
     )
 }
 
-function InningListItem({ item }, navigation) {
+function InningListItem({ item }, navigation, route) {
     return (
-        <Pressable onPress={() => navigation.navigate('Inning', {Inning: item})}>
+        <Pressable onPress={() => navigation.navigate('Inning', {Inning: item, teamMembers: route.params.teamMembers})}>
             <View style={globalStyles.item}>
                 <Text>{`Inning ${item.number}`}</Text>
                 <Text>{`${item.homeRuns ? item.homeRuns : '?'} : ${item.awayRuns ? item.awayRuns : '?'}`}</Text>

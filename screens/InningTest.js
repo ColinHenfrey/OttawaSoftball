@@ -1,53 +1,80 @@
 import {Text, View, StyleSheet, Button, LogBox, Animated, PanResponder, Dimensions} from "react-native";
-import React, {Component, useState} from "react";
+import React, {Component, useEffect, useState} from "react";
 import { useHeaderHeight } from '@react-navigation/elements';
 
-export default function InningTest () {
+
+export default function InningTest ({ route }) {
     LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    let headerHeight = 0;
+    const shownFieldPositions = ['next', 'home', 'first', 'second', 'third']
+    let currentPlayerIndex = 0;
+    let headerHeight;
     try {
         headerHeight = useHeaderHeight();
     } catch (e) {
         headerHeight = 0;
     }
 
-    const [playerPositions, setPlayerPositions] = useState(new Map());
+    useEffect(() => {
+        let players = route.params.teamMembers;
+        let newPlayerPosition = players.map(player => ({
+            ...player,
+            name: player.label,
+        }));
+        setPlayerPositions(newPlayerPosition);
+    }, [])
 
-    const movePlayer = (player, position) => {
-        const pp = [...playerPositions.values()]
-        if (playerPositions && pp.includes(position)) {
+    const [playerPositions, setPlayerPositions] = useState([{}]);
+    const [playerIndex, setPlayerIndex] = useState(0);
+
+    // use useefect in the player class to track the position and then set the location based on the position
+
+    const movePlayer = (name, position) => {
+        // console.log('moved player', name, position)
+        let playerIndex = playerPositions.findIndex(player => player.name === name)
+        let currentPlayer = playerPositions[playerIndex]
+        if (playerPositions && playerPositions.some(player => player.position === position)) {
             return false
         } else {
+            console.log('updated state')
             let state = playerPositions
-            delete state[player];
-            if(position === 'out') {
-                setPlayerPositions(state)
-            } else {
-                state.set(player, position)
-                setPlayerPositions(state)
-            }
+            state[playerIndex] = {...currentPlayer, position: position}
+            setPlayerPositions([...state])
         }
         return true;
     }
 
     console.log('header height: ' + headerHeight)
     return (
-        <View style={styles.mainContainer}>
+            <View style={{...styles.mainContainer}}>
 
-            <View style={shapes.field}>
-                <View style={{...shapes.base, ...styles.first}} />
-                <View style={{...shapes.base, ...styles.second}} />
-                <View style={{...shapes.base, ...styles.third}} />
-                <View style={{...shapes.base, ...styles.home}} />
-            </View>
+                <View style={shapes.field}>
+                    <View style={{...shapes.base, ...styles.first}} />
+                    <View style={{...shapes.base, ...styles.second}} />
+                    <View style={{...shapes.base, ...styles.third}} />
+                    <View style={{...shapes.base, ...styles.home}} />
+                </View>
 
-            <Player firstBasePosition={{x: FIRST_BASE_POS.x, y: FIRST_BASE_POS.y + headerHeight}} secondBasePosition={{x: SECOND_BASE_POS.x, y: SECOND_BASE_POS.y + headerHeight}}
-                    homeBasePosition={{x: HOME_BASE_POS.x, y: HOME_BASE_POS.y + headerHeight}} thirdBasePosition={{x: THIRD_BASE_POS.x, y: THIRD_BASE_POS.y + headerHeight}} headerHeight={headerHeight} name='CH'
-                    movePlayer={movePlayer}/>
-            <Player firstBasePosition={{x: FIRST_BASE_POS.x, y: FIRST_BASE_POS.y + headerHeight}} secondBasePosition={{x: SECOND_BASE_POS.x, y: SECOND_BASE_POS.y + headerHeight}}
-                    homeBasePosition={{x: HOME_BASE_POS.x, y: HOME_BASE_POS.y + headerHeight}} thirdBasePosition={{x: THIRD_BASE_POS.x, y: THIRD_BASE_POS.y + headerHeight}} headerHeight={headerHeight} name='PH'
-                    movePlayer={movePlayer}/>
+                {playerPositions.map(player => {
+                    console.log(player.name, player?.position, shownFieldPositions?.includes(player?.position))
+                    // shownFieldPositions?.includes(player?.position)
+                    if (player?.position && shownFieldPositions?.includes(player?.position)) {
+                        return (<Player firstBasePosition={{x: FIRST_BASE_POS.x, y: FIRST_BASE_POS.y + headerHeight}} secondBasePosition={{x: SECOND_BASE_POS.x, y: SECOND_BASE_POS.y + headerHeight}}
+                                        homeBasePosition={{x: HOME_BASE_POS.x, y: HOME_BASE_POS.y + headerHeight}} thirdBasePosition={{x: THIRD_BASE_POS.x, y: THIRD_BASE_POS.y + headerHeight}} headerHeight={headerHeight} name={player.name}
+                                        movePlayer={movePlayer} key={player.name}/>)
+                    }
+                })}
 
+
+                <View style={{position: 'absolute', justifyContent: 'center', bottom: 30}}>
+                    <Button style={{}}  title="Add player" onPress={() => {
+                        console.log(playerIndex)
+                        let updatedPlayerPositions = playerPositions;
+                        updatedPlayerPositions[playerIndex] = {...updatedPlayerPositions[playerIndex], position: 'home'}
+                        updatedPlayerPositions[playerIndex + 1] = {...updatedPlayerPositions[playerIndex + 1], position: 'next'}
+                        setPlayerPositions([...updatedPlayerPositions])
+                        setPlayerIndex(playerIndex + 1);
+                    }} />
+                </View>
         </View>
     )
 }
@@ -72,7 +99,7 @@ class Player extends Component{
             onPanResponderRelease           : (e, gesture) => {
                 let playerPosition = this.getPlayerPosition(gesture)
                 if (!playerPosition) {
-                    console.log(this.state.out)
+
                 } else {
                     Animated.spring(
                         this.state.pan,
@@ -177,7 +204,7 @@ class Player extends Component{
 
 }
 let RELEASE_RADIUS = 40;
-let PLAYER_RADIUS = 30;
+let PLAYER_RADIUS = 40;
 let Window = Dimensions.get('window');
 let FIELD_LENGTH = 200
 let BASE_LENGTH = 40;
@@ -207,22 +234,20 @@ let styles = StyleSheet.create({
         backgroundColor:'#2c3e50',
     },
     text        : {
-        marginTop   : 25,
-        marginLeft  : 5,
-        marginRight : 5,
         textAlign   : 'center',
-        color       : '#fff'
+        color       : '#fff',
     },
     draggableContainer: {
         position    : 'absolute',
-        flex: 1
+        flex: 1,
     },
     circle      : {
         backgroundColor     : '#1abc9c',
         width               : PLAYER_RADIUS*2,
         height              : PLAYER_RADIUS*2,
         borderRadius        : PLAYER_RADIUS,
-        position: "absolute"
+        position: "absolute",
+        justifyContent: "center"
     },
     first: {bottom: 0, right: 0},
     second: {top: 0, right: 0},
