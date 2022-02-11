@@ -5,8 +5,7 @@ import { useHeaderHeight } from '@react-navigation/elements';
 
 export default function InningTest ({ route }) {
     LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    const shownFieldPositions = ['next', 'home', 'first', 'second', 'third']
-    let currentPlayerIndex = 0;
+    const shownFieldPositions = ['home', 'first', 'second', 'third']
     let headerHeight;
     try {
         headerHeight = useHeaderHeight();
@@ -14,17 +13,28 @@ export default function InningTest ({ route }) {
         headerHeight = 0;
     }
 
-    useEffect(() => {
+    const [playerPositions, setPlayerPositions] = useState([{}]);
+    const [playerIndex, setPlayerIndex] = useState(1);
+
+    useEffect(async () => {
         let players = route.params.teamMembers;
-        let newPlayerPosition = players.map(player => ({
+        let newPlayerPosition = players.map((player, index) => ({
             ...player,
             name: player.label,
+            position: index === 0 ? 'home' : index === 1 ? 'next' : null
         }));
-        setPlayerPositions(newPlayerPosition);
+        setPlayerPositions(newPlayerPosition)
     }, [])
 
-    const [playerPositions, setPlayerPositions] = useState([{}]);
-    const [playerIndex, setPlayerIndex] = useState(0);
+    const nextBatter = () => {
+        let updatedPlayerPositions = playerPositions;
+        let nextPlayerIndex = playerIndex >= route.params.teamMembers.length - 1 ? 0 : playerIndex + 1
+        updatedPlayerPositions[playerIndex] = {...updatedPlayerPositions[playerIndex], position: 'home'}
+        console.log(nextPlayerIndex)
+        updatedPlayerPositions[nextPlayerIndex] = {...updatedPlayerPositions[nextPlayerIndex], position: 'next'}
+        setPlayerPositions([...updatedPlayerPositions])
+        setPlayerIndex(nextPlayerIndex);
+    }
 
     const movePlayer = async (name, position) => {
         let playerIndex = playerPositions.findIndex(player => player.name === name)
@@ -35,7 +45,7 @@ export default function InningTest ({ route }) {
     }
 
     const canMoveToBase = (position) => {
-        return playerPositions && !playerPositions.some(player => player.position === position);
+        return playerPositions && position && !playerPositions.some(player => player.position === position);
     }
 
     return (
@@ -56,15 +66,14 @@ export default function InningTest ({ route }) {
                     }
                 })}
 
+                <Text style={{textDecorationLine: 'underline', position: 'absolute', left: 50, top: 500}}>Up Next</Text>
+                <View
+                    style={{...styles.circle, left: 35, top: 520}}>
+                    <Text style={styles.text}>{playerPositions.find(player => player.position === 'next')?.name || 'test'}</Text>
+                </View>
 
                 <View style={{position: 'absolute', justifyContent: 'center', bottom: 30}}>
-                    <Button style={{}}  title="Add player" onPress={() => {
-                        let updatedPlayerPositions = playerPositions;
-                        updatedPlayerPositions[playerIndex] = {...updatedPlayerPositions[playerIndex], position: 'home'}
-                        // updatedPlayerPositions[playerIndex + 1] = {...updatedPlayerPositions[playerIndex + 1], position: 'next'}
-                        // setPlayerPositions([...updatedPlayerPositions])
-                        setPlayerIndex(playerIndex + 1);
-                    }} />
+                    <Button style={{}}  title="Add player" onPress={nextBatter} />
                 </View>
         </View>
     )
@@ -89,6 +98,10 @@ class Player extends Component{
             }], {}),
             onPanResponderRelease           : async (e, gesture) => {
                 let releasedBase = this.getReleasedBase(gesture)
+                if (releasedBase === 'out') {
+                    this.props.movePlayer(this.props.name, releasedBase)
+                    return;
+                }
                 let validMove = this.props.canMoveToBase(releasedBase)
                 //If it's not a valid move then just return it to it's current location
                 if (!validMove) {
@@ -150,10 +163,10 @@ class Player extends Component{
                         left: this.props.homeBasePosition.x - PLAYER_RADIUS,
                         top: this.props.homeBasePosition.y - PLAYER_RADIUS
                 };
-            case 'next':
+            case 'out':
                 return {
-                    left: 0,
-                    top: 0
+                    left: this.props.homeBasePosition.x - PLAYER_RADIUS,
+                    top: this.props.homeBasePosition.y - PLAYER_RADIUS - 50
                 };
         }
     }
@@ -182,8 +195,7 @@ class Player extends Component{
     render(){
         let currentLocation = this.getPlayerPosition(this.props.base)
         return (
-            // <View style={{...styles.draggableContainer, left: this.state.position?.left, top: this.state.position?.top - this.props.headerHeight}}>
-             <View style={{...styles.draggableContainer, left: currentLocation.left, top: currentLocation.top - this.props.headerHeight}}>
+            <View style={{...styles.draggableContainer, left: currentLocation.left, top: currentLocation.top - this.props.headerHeight}}>
                 <Animated.View
                     {...this.panResponder.panHandlers}
                     style={[this.state.pan.getLayout(), styles.circle, {backgroundColor: '#1abc9c'}]}>
@@ -194,6 +206,7 @@ class Player extends Component{
     }
 
 }
+
 let RELEASE_RADIUS = 40;
 let PLAYER_RADIUS = 40;
 let Window = Dimensions.get('window');
