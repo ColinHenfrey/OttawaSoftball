@@ -26,24 +26,18 @@ export default function InningTest ({ route }) {
     const [playerPositions, setPlayerPositions] = useState([{}]);
     const [playerIndex, setPlayerIndex] = useState(0);
 
-    // use useefect in the player class to track the position and then set the location based on the position
-
-    const movePlayer = (name, position) => {
-        // console.log('moved player', name, position)
+    const movePlayer = async (name, position) => {
         let playerIndex = playerPositions.findIndex(player => player.name === name)
         let currentPlayer = playerPositions[playerIndex]
-        if (playerPositions && playerPositions.some(player => player.position === position)) {
-            return false
-        } else {
-            console.log('updated state')
-            let state = playerPositions
-            state[playerIndex] = {...currentPlayer, position: position}
-            setPlayerPositions([...state])
-        }
-        return true;
+        let state = playerPositions
+        state[playerIndex] = {...currentPlayer, position: position}
+        await setPlayerPositions([...state])
     }
 
-    console.log('header height: ' + headerHeight)
+    const canMoveToBase = (position) => {
+        return playerPositions && !playerPositions.some(player => player.position === position);
+    }
+
     return (
             <View style={{...styles.mainContainer}}>
 
@@ -55,23 +49,20 @@ export default function InningTest ({ route }) {
                 </View>
 
                 {playerPositions.map(player => {
-                    console.log(player.name, player?.position, shownFieldPositions?.includes(player?.position))
-                    // shownFieldPositions?.includes(player?.position)
                     if (player?.position && shownFieldPositions?.includes(player?.position)) {
                         return (<Player firstBasePosition={{x: FIRST_BASE_POS.x, y: FIRST_BASE_POS.y + headerHeight}} secondBasePosition={{x: SECOND_BASE_POS.x, y: SECOND_BASE_POS.y + headerHeight}}
                                         homeBasePosition={{x: HOME_BASE_POS.x, y: HOME_BASE_POS.y + headerHeight}} thirdBasePosition={{x: THIRD_BASE_POS.x, y: THIRD_BASE_POS.y + headerHeight}} headerHeight={headerHeight} name={player.name}
-                                        movePlayer={movePlayer} key={player.name}/>)
+                                        movePlayer={movePlayer} base={player.position} canMoveToBase={canMoveToBase} key={player.name}/>)
                     }
                 })}
 
 
                 <View style={{position: 'absolute', justifyContent: 'center', bottom: 30}}>
                     <Button style={{}}  title="Add player" onPress={() => {
-                        console.log(playerIndex)
                         let updatedPlayerPositions = playerPositions;
                         updatedPlayerPositions[playerIndex] = {...updatedPlayerPositions[playerIndex], position: 'home'}
-                        updatedPlayerPositions[playerIndex + 1] = {...updatedPlayerPositions[playerIndex + 1], position: 'next'}
-                        setPlayerPositions([...updatedPlayerPositions])
+                        // updatedPlayerPositions[playerIndex + 1] = {...updatedPlayerPositions[playerIndex + 1], position: 'next'}
+                        // setPlayerPositions([...updatedPlayerPositions])
                         setPlayerIndex(playerIndex + 1);
                     }} />
                 </View>
@@ -96,77 +87,75 @@ class Player extends Component{
                 dx  : this.state.pan.x,
                 dy  : this.state.pan.y
             }], {}),
-            onPanResponderRelease           : (e, gesture) => {
-                let playerPosition = this.getPlayerPosition(gesture)
-                if (!playerPosition) {
-
-                } else {
-                    Animated.spring(
-                        this.state.pan,
-                        {
-                            toValue:
-                                {
-                                    x: playerPosition.position.left - this.state.position.left,
-                                    y: playerPosition.position.top - this.state.position.top
-                                }
-                        }
-                    ).start(() => {
-                        this.state.pan.setValue({x: 0, y: 0})
-                        this.setState({
-                            position: playerPosition.position
-                        })
-                    });
+            onPanResponderRelease           : async (e, gesture) => {
+                let releasedBase = this.getReleasedBase(gesture)
+                let validMove = this.props.canMoveToBase(releasedBase)
+                //If it's not a valid move then just return it to it's current location
+                if (!validMove) {
+                    releasedBase = this.props.base;
                 }
+                let lastLocation = this.getPlayerPosition(this.props.base)
+                let playerLocation = this.getPlayerPosition(releasedBase)
+                Animated.spring(
+                    this.state.pan,
+                    {
+                        toValue:
+                            {
+                                x: playerLocation.left - lastLocation.left,
+                                y: playerLocation.top - lastLocation.top
+                            }
+                    }
+                ).start(async () => {
+                    this.state.pan.setValue({x: 0, y: 0})
+                    await this.props.movePlayer(this.props.name, releasedBase)
+                });
             }
         });
     }
 
-    getPlayerPosition(gesture) {
-        let {movePlayer, name} = this.props
+
+    getReleasedBase(gesture) {
         if (this.isOut(gesture)) {
-            movePlayer(name, 'out')
-            return false;
+            return 'out'
         } else if (this.isInBounds(gesture, this.props.firstBasePosition)) {
-            let moved = movePlayer(name, 'first')
-            if(moved) {
-                return {
-                    position: {left: this.props.firstBasePosition.x - PLAYER_RADIUS,
-                        top: this.props.firstBasePosition.y - PLAYER_RADIUS },
-                };
-            }
+            return 'first'
         } else if (this.isInBounds(gesture, this.props.secondBasePosition)) {
-            let moved = movePlayer(name, 'second')
-            if(moved) {
+            return 'second'
+        } else if (this.isInBounds(gesture, this.props.thirdBasePosition)) {
+            return 'third'
+        } else if (this.isInBounds(gesture, this.props.homeBasePosition)) {
+            return 'home'
+        }
+    }
+
+    getPlayerPosition(base) {
+        switch(base) {
+            case 'first':
                 return {
-                    position: {
+                    left: this.props.firstBasePosition.x - PLAYER_RADIUS,
+                    top: this.props.firstBasePosition.y - PLAYER_RADIUS
+                };
+            case 'second':
+                return {
                         left: this.props.secondBasePosition.x - PLAYER_RADIUS,
                         top: this.props.secondBasePosition.y - PLAYER_RADIUS
-                    }
                 };
-            }
-        } else if (this.isInBounds(gesture, this.props.thirdBasePosition)) {
-            let moved = movePlayer(name, 'third')
-            if(moved) {
+            case 'third':
                 return {
-                    position: {
                         left: this.props.thirdBasePosition.x - PLAYER_RADIUS,
                         top: this.props.thirdBasePosition.y - PLAYER_RADIUS
-                    }
                 };
-            }
-
-        } else if (this.isInBounds(gesture, this.props.homeBasePosition)) {
-            let moved = movePlayer(name, 'home')
-            if (moved) {
+            case 'home':
                 return {
-                    position: {
                         left: this.props.homeBasePosition.x - PLAYER_RADIUS,
                         top: this.props.homeBasePosition.y - PLAYER_RADIUS
-                    }
                 };
-            }
+            case 'next':
+                return {
+                    left: 0,
+                    top: 0
+                };
         }
-        return {position: this.state.position}
     }
 
     isInBounds(gesture, base) {
@@ -191,8 +180,10 @@ class Player extends Component{
 
 
     render(){
+        let currentLocation = this.getPlayerPosition(this.props.base)
         return (
-            <View style={{...styles.draggableContainer, left: this.state.position?.left, top: this.state.position?.top - this.props.headerHeight}}>
+            // <View style={{...styles.draggableContainer, left: this.state.position?.left, top: this.state.position?.top - this.props.headerHeight}}>
+             <View style={{...styles.draggableContainer, left: currentLocation.left, top: currentLocation.top - this.props.headerHeight}}>
                 <Animated.View
                     {...this.panResponder.panHandlers}
                     style={[this.state.pan.getLayout(), styles.circle, {backgroundColor: '#1abc9c'}]}>
