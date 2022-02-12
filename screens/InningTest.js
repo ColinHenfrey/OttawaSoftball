@@ -14,7 +14,11 @@ export default function InningTest ({ route }) {
     }
 
     const [playerPositions, setPlayerPositions] = useState([{}]);
+    const [outs, setOuts] = useState([]);
+    const [runs, setRuns] = useState(0);
     const [playerIndex, setPlayerIndex] = useState(1);
+    const [actions, setActions] = useState([]);
+    const [lastPlayerActions, setLastPlayerActions] = useState([]);
 
     useEffect(async () => {
         let players = route.params.teamMembers;
@@ -23,24 +27,43 @@ export default function InningTest ({ route }) {
             name: player.label,
             position: index === 0 ? 'home' : index === 1 ? 'next' : null
         }));
+        setLastPlayerActions([{name: newPlayerPosition[0].name, position: 'home'}])
         setPlayerPositions(newPlayerPosition)
     }, [])
 
     const nextBatter = () => {
-        let updatedPlayerPositions = playerPositions;
         let nextPlayerIndex = playerIndex >= route.params.teamMembers.length - 1 ? 0 : playerIndex + 1
-        updatedPlayerPositions[playerIndex] = {...updatedPlayerPositions[playerIndex], position: 'home'}
-        console.log(nextPlayerIndex)
-        updatedPlayerPositions[nextPlayerIndex] = {...updatedPlayerPositions[nextPlayerIndex], position: 'next'}
-        setPlayerPositions([...updatedPlayerPositions])
+        movePlayer(playerPositions[playerIndex].name, 'home')
+            .then(movePlayer(playerPositions[nextPlayerIndex].name, 'next'))
         setPlayerIndex(nextPlayerIndex);
+        setLastPlayerActions([...playerPositions.filter(player => shownFieldPositions.includes(player.position))
+            .map(player => ({name: player.name, position: player.position}))])
+        setActions([])
     }
 
-    const movePlayer = async (name, position) => {
+    const movePlayer = async (name, position, undo) => {
         let playerIndex = playerPositions.findIndex(player => player.name === name)
         let currentPlayer = playerPositions[playerIndex]
         let state = playerPositions
-        state[playerIndex] = {...currentPlayer, position: position}
+        let run = false
+        if (position === 'out') {
+            setOuts([...outs, name])
+            state[playerIndex] = {...currentPlayer, position: null}
+        // if last position is null then we just want to move the player to home
+        // also if it's undo then don't count it as a run
+        } else if (position === 'home' && currentPlayer?.position !== 'next' && !undo) {
+            await setRuns((previousRuns) => previousRuns + 1)
+            run = true
+            state[playerIndex] = {...currentPlayer, position: null}
+        } else {
+            state[playerIndex] = {...currentPlayer, position: position}
+        }
+        // let playerActionIndex = actions.findIndex(action => action?.name === name)
+        //If the player has already moved during this players batting then we update their position
+        if(position !== 'next') {
+            let currentActions = actions.filter(action => action?.name !== name);
+            setActions([...currentActions, {name: name, position: position, run: run}])
+        }
         await setPlayerPositions([...state])
     }
 
@@ -48,8 +71,48 @@ export default function InningTest ({ route }) {
         return playerPositions && position && !playerPositions.some(player => player.position === position);
     }
 
+    const homeRunAction = () => {
+        playerPositions.forEach((player) => {
+            if (shownFieldPositions.includes(player.position)) {
+                movePlayer(player.name, 'home')
+            }
+        });
+    }
+
+    const undoAction = () => {
+        console.log('last player actions', lastPlayerActions)
+        console.log('actions:', actions)
+        if(actions.length < 1) {
+            return
+        }
+        let lastActionIndex = actions.length - 1;
+        let lastAction = actions[lastActionIndex]
+        let playerLastInning = lastPlayerActions.find(player => player.name === lastAction.name)
+        if (lastAction?.run) {
+            setRuns((runs) => runs - 1)
+        }
+        if(lastAction.position === 'out') {
+            let lastOuts = outs
+            lastOuts.pop()
+            setOuts(lastOuts)
+        }
+        movePlayer(playerLastInning.name, playerLastInning.position, true)
+        //remove last action from list
+        let previousActions = actions
+        previousActions.pop()
+        setActions([...previousActions])
+    }
+
     return (
             <View style={{...styles.mainContainer}}>
+
+                <View style={{position: 'absolute', justifyContent: 'center', textAlign: 'center', top: 50}}>
+                    {actions.map((action) =>
+                        <Text key={action?.name} style={{borderWidth: 2, borderRadius: 10, padding: 3, marginTop: 2, textAlign: 'center'}}>
+                            {`${action?.name} moved from ${lastPlayerActions?.find(a => a?.name === action?.name)?.position} to ${action?.position}`}
+                        </Text>
+                    )}
+                </View>
 
                 <View style={shapes.field}>
                     <View style={{...shapes.base, ...styles.first}} />
@@ -66,13 +129,31 @@ export default function InningTest ({ route }) {
                     }
                 })}
 
-                <Text style={{textDecorationLine: 'underline', position: 'absolute', left: 50, top: 500}}>Up Next</Text>
+                <Text style={{textDecorationLine: 'underline', position: 'absolute', right: 50, top: 200, fontSize: 25}}>{`Runs: ${runs}`}</Text>
+
+                <Text style={{textDecorationLine: 'underline', position: 'absolute', left: 50, top: 200, fontSize: 25}}>Outs</Text>
+                {outs.map((out, index) => (
+                    <View
+                        style={{...styles.circle, left: 15 + index*35, top: 230, width: 30, height: 30}}>
+                        <Text style={{...styles.text, fontSize: 5}}>{out}</Text>
+                    </View>
+                ))}
+
+                <View style={{position: 'absolute', left: 20, top: 500}}>
+                    <Button title='Home Run' onPress={homeRunAction} />
+                </View>
+
+                <View style={{position: 'absolute', right: 30, top: 500}}>
+                    <Button title='Undo' onPress={undoAction} />
+                </View>
+
+                <Text style={{textDecorationLine: 'underline', position: 'absolute', left: 50, top: 550}}>Up Next</Text>
                 <View
-                    style={{...styles.circle, left: 35, top: 520}}>
+                    style={{...styles.circle, left: 35, top: 570}}>
                     <Text style={styles.text}>{playerPositions.find(player => player.position === 'next')?.name || 'test'}</Text>
                 </View>
 
-                <View style={{position: 'absolute', justifyContent: 'center', bottom: 30}}>
+                <View style={{position: 'absolute', justifyContent: 'center', bottom: 50}}>
                     <Button style={{}}  title="Add player" onPress={nextBatter} />
                 </View>
         </View>
@@ -120,7 +201,9 @@ class Player extends Component{
                     }
                 ).start(async () => {
                     this.state.pan.setValue({x: 0, y: 0})
-                    await this.props.movePlayer(this.props.name, releasedBase)
+                    if (releasedBase !== this.props.base) {
+                        await this.props.movePlayer(this.props.name, releasedBase)
+                    }
                 });
             }
         });
@@ -165,8 +248,8 @@ class Player extends Component{
                 };
             case 'out':
                 return {
-                    left: this.props.homeBasePosition.x - PLAYER_RADIUS,
-                    top: this.props.homeBasePosition.y - PLAYER_RADIUS - 50
+                    left: 0,
+                    top: 0
                 };
         }
     }
