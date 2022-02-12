@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, Button, LogBox, Animated, PanResponder, Dimensions} from "react-native";
+import {Text, View, StyleSheet, Button, LogBox, Animated, PanResponder, Dimensions, Alert} from "react-native";
 import React, {Component, useEffect, useState} from "react";
 import { useHeaderHeight } from '@react-navigation/elements';
 
@@ -68,7 +68,7 @@ export default function InningTest ({ route }) {
     }
 
     const canMoveToBase = (position) => {
-        return playerPositions && position && !playerPositions.some(player => player.position === position);
+        return (playerPositions && position && !playerPositions.some(player => player.position === position)) || position === 'home';
     }
 
     const homeRunAction = () => {
@@ -80,8 +80,6 @@ export default function InningTest ({ route }) {
     }
 
     const undoAction = () => {
-        console.log('last player actions', lastPlayerActions)
-        console.log('actions:', actions)
         if(actions.length < 1) {
             return
         }
@@ -101,6 +99,27 @@ export default function InningTest ({ route }) {
         let previousActions = actions
         previousActions.pop()
         setActions([...previousActions])
+    }
+
+    const confirmActions = () => {
+        if (playerPositions.some(player => player.position === 'home')) {
+            Alert.alert('Move current batter off home plate',
+                'The next batter cannot be added until the current batter is moved off of home plate')
+            return
+        }
+        let batterActions = actions.map(action => `${action?.name}: ${lastPlayerActions?.find(a => a?.name === action?.name)?.position} -> ${action?.position}`).join(`\n`);
+        Alert.alert(
+            "Confirm actions for this Batter",
+            batterActions,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {text: "OK", onPress: () => nextBatter()}
+            ]
+        );
     }
 
     return (
@@ -154,7 +173,7 @@ export default function InningTest ({ route }) {
                 </View>
 
                 <View style={{position: 'absolute', justifyContent: 'center', bottom: 50}}>
-                    <Button style={{}}  title="Add player" onPress={nextBatter} />
+                    <Button style={{}}  title="Next Batter" onPress={confirmActions} />
                 </View>
         </View>
     )
