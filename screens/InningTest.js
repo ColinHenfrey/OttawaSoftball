@@ -31,6 +31,24 @@ export default function InningTest ({ route }) {
         setPlayerPositions(newPlayerPosition)
     }, [])
 
+    React.useEffect(() => {
+        console.log('outs', outs)
+        if (outs.length > 2) {
+            Alert.alert(
+                "That's 3 outs are you sure you want to end the inning?",
+                null,
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => undoAction(),
+                        style: "cancel"
+                    },
+                    {text: "OK", onPress: () => console.log('Inning over')}
+                ]
+            );
+        }
+    }, [outs]);
+
     const nextBatter = () => {
         let nextPlayerIndex = playerIndex >= route.params.teamMembers.length - 1 ? 0 : playerIndex + 1
         movePlayer(playerPositions[playerIndex].name, 'home')
@@ -47,7 +65,7 @@ export default function InningTest ({ route }) {
         let state = playerPositions
         let run = false
         if (position === 'out') {
-            setOuts([...outs, name])
+            setOuts(previousOuts =>  [...previousOuts, name])
             state[playerIndex] = {...currentPlayer, position: null}
         // if last position is null then we just want to move the player to home
         // also if it's undo then don't count it as a run
@@ -153,7 +171,7 @@ export default function InningTest ({ route }) {
                 <Text style={{textDecorationLine: 'underline', position: 'absolute', left: 50, top: 200, fontSize: 25}}>Outs</Text>
                 {outs.map((out, index) => (
                     <View
-                        style={{...styles.circle, left: 15 + index*35, top: 230, width: 30, height: 30}}>
+                        style={{...styles.circle, left: 15 + index*35, top: 230, width: 30, height: 30}} key={out.name + index.toLocaleString()}>
                         <Text style={{...styles.text, fontSize: 5}}>{out}</Text>
                     </View>
                 ))}
