@@ -8,13 +8,13 @@ import { useEffect, useMemo, useState } from "react";
 import UserContext from "./context/UserContext";
 import Inning from "./screens/Inning";
 import BattingOrder from "./screens/BattingOrder";
-import { SafeAreaView } from "react-native";
 import styles from "./styles/styles";
-import {View} from "react-native";
+import {SafeAreaView, View} from "react-native";
 import InningTest from "./screens/InningTest";
 import Game from "./screens/Game";
 import UpcomingGames from "./screens/UpcomingGames";
 import HomeStack from "./screens/HomeStack";
+import GameHistory from "./screens/GameHistory";
 
 export default function App() {
 
@@ -40,12 +40,7 @@ export default function App() {
         <UserContext.Provider value={value}>
             <NavigationContainer>
                 {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeStack/>}
-                {/*<UpcomingGames />*/}
-                {/*<HomeNav />*/}
-                {/*<BattingOrder />*/}
-                {/*<Inning />*/}
-                {/*<InningTest />*/}
-                {/*<Game />*/}
+                {/*<GameHistory />*/}
                 <StatusBar/>
             </NavigationContainer>
         </UserContext.Provider>

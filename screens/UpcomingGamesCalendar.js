@@ -64,7 +64,7 @@ export default function UpcomingGamesCalendar({ navigation }) {
         setMarked({...newMarked});
         const datePosition = games.findIndex((item) => item.dateString === dateString);
         if (datePosition !== -1) {
-            scrollView.current?.scrollTo({x: datePosition*350 - 10});
+            scrollView.current?.scrollTo({x: datePosition*355});
         }
     }
 
@@ -99,8 +99,6 @@ export default function UpcomingGamesCalendar({ navigation }) {
                     ref={scrollView}
                     onScrollEndDrag={handleScroll}
                     horizontal= {true}
-                    decelerationRate={0}
-                    snapToInterval={350}
                     snapToAlignment={"center"}
                     contentInset={{
                         top: 0,

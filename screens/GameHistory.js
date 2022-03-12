@@ -1,7 +1,7 @@
 import {
     View, Button, ScrollView
 } from "react-native";
-import { useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import moment from "moment";
 import GameHistoryListItem from "./GameHistoryListItem";
 
