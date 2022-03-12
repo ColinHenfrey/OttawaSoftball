@@ -14,6 +14,7 @@ import styles from "./styles";
 import {View} from "react-native";
 import InningTest from "./screens/InningTest";
 import Game from "./screens/Game";
+import UpcomingGames from "./screens/UpcomingGames";
 
 export default function App() {
 
@@ -39,6 +40,7 @@ export default function App() {
         <UserContext.Provider value={value}>
             <NavigationContainer>
                 {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeNav/>}
+                {/*<UpcomingGames />*/}
                 {/*<HomeNav />*/}
                 {/*<BattingOrder />*/}
                 {/*<Inning />*/}

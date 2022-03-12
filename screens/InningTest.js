@@ -104,6 +104,20 @@ export default function InningTest ({ route }) {
         let lastActionIndex = actions.length - 1;
         let lastAction = actions[lastActionIndex]
         let playerLastInning = lastPlayerActions.find(player => player.name === lastAction.name)
+        if (!canMoveToBase(playerLastInning.position)) {
+            Alert.alert(
+                "Cannot undo action because player is on base",
+                "Would you like to Undo all actions?",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => {},
+                        style: "cancel"
+                    },
+                    {text: "OK", onPress: () => actions.forEach(undoAction)}
+                ]
+            );
+        }
         if (lastAction?.run) {
             setRuns((runs) => runs - 1)
         }

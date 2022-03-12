@@ -30,4 +30,19 @@ export default StyleSheet.create({
         borderBottomColor: colors.light,
         backgroundColor: colors.white
     },
+    calenderItem: {
+        flexDirection: "row",
+        justifyContent: 'center',
+        padding: 10,
+        fontSize: 18,
+        height: 60,
+        width: 330,
+        marginRight: 20,
+        backgroundColor: colors.white,
+        borderRadius: 20
+    },
+    title: {
+        fontSize: 20,
+        padding: 10,
+    }
 });
