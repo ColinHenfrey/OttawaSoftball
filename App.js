@@ -6,7 +6,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useMemo, useState } from "react";
 import UserContext from "./context/UserContext";
-import HomeNav from "./screens/HomeNav";
 import Inning from "./screens/Inning";
 import BattingOrder from "./screens/BattingOrder";
 import { SafeAreaView } from "react-native";
@@ -15,6 +14,7 @@ import {View} from "react-native";
 import InningTest from "./screens/InningTest";
 import Game from "./screens/Game";
 import UpcomingGames from "./screens/UpcomingGames";
+import HomeStack from "./screens/HomeStack";
 
 export default function App() {
 
@@ -39,7 +39,7 @@ export default function App() {
     return (
         <UserContext.Provider value={value}>
             <NavigationContainer>
-                {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeNav/>}
+                {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeStack/>}
                 {/*<UpcomingGames />*/}
                 {/*<HomeNav />*/}
                 {/*<BattingOrder />*/}

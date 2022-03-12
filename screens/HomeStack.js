@@ -6,7 +6,7 @@ import KeepScore from "./KeepScore";
 import BattingOrder from "./BattingOrder";
 import InningTest from "./InningTest";
 
-export default function HomeNav() {
+export default function HomeStack() {
 
     const Stack = createNativeStackNavigator()
 
