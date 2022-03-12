@@ -8,7 +8,7 @@ import Text from "../styledComponents/Text"
 import { Pressable, TextInput } from "react-native";
 
 
-export default function GameHistoryListItem(item) {
+export default function GameHistoryListItem({item, navigation}) {
     const won = !item.homeScore ? undefined : item.homeScore > item.awayScore
     let WinLossBubble = () => {
         return (
@@ -22,15 +22,17 @@ export default function GameHistoryListItem(item) {
     }
 
     return (
-        <View style={globalStyles.calenderItem} key={item.ID}>
-            <View style={{flexDirection: "column", flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                {WinLossBubble(item)}
+        <Pressable onPress={() => navigation.navigate('Game', {game: item})} key={item.ID}>
+            <View style={globalStyles.calenderItem} key={item.ID}>
+                <View style={{flexDirection: "column", flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    {WinLossBubble(item)}
+                </View>
+                <View style={{flex: 2, textAlign:'right', justifyContent: 'center'}}>
+                    <Text style={styles.calenderItemTime}>{item.moment.format('MMMM Do, h:mm A')}</Text>
+                    <Text style={styles.text}>{`${item.home} vs ${item.away}`}</Text>
+                    <Text style={styles.text}>{`${item.homeScore || '?'} vs ${item.awayScore || '?'}`}</Text>
+                </View>
             </View>
-            <View style={{flex: 2, textAlign:'right', justifyContent: 'center'}}>
-                <Text style={styles.calenderItemTime}>{item.moment.format('MMMM Do, h:mm A')}</Text>
-                <Text style={styles.text}>{`${item.home} vs ${item.away}`}</Text>
-                <Text style={styles.text}>{`${item.homeScore || '?'} vs ${item.awayScore || '?'}`}</Text>
-            </View>
-        </View>
+        </Pressable>
     )
 }

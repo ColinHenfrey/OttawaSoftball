@@ -1,16 +1,24 @@
 import {
     View, Button, ScrollView
 } from "react-native";
-import React, { useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 import moment from "moment";
 import GameHistoryListItem from "./GameHistoryListItem";
 
-export default function GameHistory() {
+export default function GameHistory({navigation}) {
     const [ games, setGames ] = useState([]);
 
     useEffect(async () => {
         await getGames()
     }, [])
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            await getGames()
+        });
+
+        return unsubscribe;
+    }, [navigation]);
 
     const getGames = async () => {
         try {
@@ -33,6 +41,7 @@ export default function GameHistory() {
                 game.moment = date;
                 return game;
             }));
+            console.log(games)
         } catch (error) {
             console.error(error);
         }
@@ -41,7 +50,7 @@ export default function GameHistory() {
     return (
         <View style={{flex: 1, alignItems: 'center'}}>
             <ScrollView style={{flex: 1}}>
-                {games.map(GameHistoryListItem)}
+                {games.map((item) => GameHistoryListItem({item, navigation}))}
             </ScrollView>
         </View>
     )
