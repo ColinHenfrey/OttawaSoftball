@@ -9,6 +9,7 @@ import moment from "moment";
 import styles from "../styles/styles";
 import colors from "../colors";
 import Text from "../styledComponents/Text"
+import UpcomingGameListItem from "./UpcomingGamesListItem";
 
 export default function UpcomingGamesList({ navigation }) {
     const { userID, setUserID } = useContext(UserContext);
@@ -53,33 +54,6 @@ export default function UpcomingGamesList({ navigation }) {
         } catch (error) {
             console.error(error);
         }
-    }
-
-    let UpcomingGameListItem = ({item, navigation}) => {
-        return (
-            <Pressable onPress={() => navigation.navigate('Game', {game: item})} key={item.ID}>
-                <View style={globalStyles.calenderItem}>
-                    <View style={{flexDirection: "column", flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                        {dateBubble(item.moment)}
-                    </View>
-                    <View style={{flex: 2, textAlign:'right', justifyContent: 'center'}}>
-                        <Text style={styles.calenderItemTime}>{item.moment.format('h:mm:ss A')}</Text>
-                        <Text style={styles.text}>{`${item.home} vs ${item.away}`}</Text>
-                        <Text style={styles.text}>{item.fieldName}</Text>
-                    </View>
-                </View>
-            </Pressable>
-        )
-    }
-
-
-    let dateBubble = (moment) => {
-        return (
-            <View style={styles.dateBubbleContainer}>
-                <Text style={styles.dateBubbleDay}>{moment.date()}</Text>
-                <Text style={styles.dateBubbleMonth}>{moment.format('MMM')}</Text>
-            </View>
-        )
     }
 
     return (

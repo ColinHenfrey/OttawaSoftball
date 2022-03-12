@@ -6,5 +6,7 @@ export default {
     dark: '#444',
     darker: '#222',
     black: '#000',
-    primaryText: 'black'
+    primaryText: 'black',
+    green: '#85f182',
+    red: '#fa4f4f'
 };
