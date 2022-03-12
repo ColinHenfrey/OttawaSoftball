@@ -1,5 +1,5 @@
 import {Button, FlatList, Pressable, Text, View} from "react-native";
-import globalStyles from '../styles'
+import globalStyles from '../styles/styles'
 import {useContext, useEffect, useState} from "react";
 import UserContext from "../context/UserContext";
 

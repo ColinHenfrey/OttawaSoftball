@@ -1,5 +1,5 @@
 import {Button, TextInput, View} from "react-native";
-import styles from "../styles";
+import styles from "../styles/styles";
 import {useContext, useState} from "react";
 import UserContext from "../context/UserContext";
 

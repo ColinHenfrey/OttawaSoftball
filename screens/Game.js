@@ -1,5 +1,5 @@
 import {View, Text, Button, Linking, Platform} from "react-native";
-import styles from "../styles";
+import styles from "../styles/styles";
 import Moment from "moment/moment";
 
 

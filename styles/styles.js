@@ -1,5 +1,5 @@
 import {StyleSheet} from "react-native";
-import colors from "react-native/Libraries/NewAppScreen/components/Colors";
+import colors from "../colors"
 
 export default StyleSheet.create({
     container: {
@@ -35,7 +35,7 @@ export default StyleSheet.create({
         justifyContent: 'center',
         padding: 10,
         fontSize: 18,
-        height: 60,
+        height: '80%',
         width: 330,
         marginRight: 20,
         backgroundColor: colors.white,
@@ -44,5 +44,25 @@ export default StyleSheet.create({
     title: {
         fontSize: 20,
         padding: 10,
+    },
+    calenderItemTime: {
+        fontWeight: 'bold',
+    },
+    dateBubbleContainer: {
+        borderRadius: 100,
+        backgroundColor: colors.primary,
+        justifyContent: "center",
+        alignItems: "center",
+        width: 80,
+        height: 80,
+        color: colors.white
+    },
+    dateBubbleDay: {
+        fontSize: 30,
+        padding: 0
+    },
+    dateBubbleMonth: {
+        fontSize: 15,
+        padding:0
     }
 });

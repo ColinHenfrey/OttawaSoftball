@@ -1,20 +1,15 @@
 import {
-    FlatList, View, Text, StyleSheet, Pressable, Button,
+    FlatList, View, StyleSheet, Pressable, Button,
     PanResponder, Animated, TouchableOpacity, ScrollView, Dimensions
 } from "react-native";
 import UserContext from "../context/UserContext";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import globalStyles from '../styles'
-import Moment from "moment/moment";
+import globalStyles from '../styles/styles'
 import {Agenda, Calendar, CalendarList} from "react-native-calendars";
 import moment from "moment";
-import Window from "@react-navigation/native/src/__mocks__/window";
-import styles from "../styles";
-
-const timeToString = (time) => {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-};
+import styles from "../styles/styles";
+import colors from "../colors";
+import Text from "../styledComponents/Text"
 
 export default function UpcomingGames({ navigation }) {
     const { userID, setUserID } = useContext(UserContext);
@@ -46,14 +41,14 @@ export default function UpcomingGames({ navigation }) {
             const newMarked = {};
             setGames(response?.games.map((game) => {
                 const date = moment(game.date)
-                game.date = date.format('YYYY-MM-DD');
-                game.time = date.hour();
+                game.dateString = date.format('YYYY-MM-DD');
+                game.moment = date;
                 return game;
             }));
             response?.games.forEach(game => {
                 let dateString = moment(game.date).format('YYYY-MM-DD')
                 newItems[dateString] = [game]
-                newMarked[dateString] = {disabled: false, marked: true}
+                newMarked[dateString] = {disabled: false, marked: true, dotColor: colors.primary}
             });
             setItems(newItems);
             setMarked(newMarked);
@@ -69,9 +64,9 @@ export default function UpcomingGames({ navigation }) {
     let selectDate = (dateString) => {
         let newMarked = {};
         Object.keys(marked).forEach(key => (newMarked[key] = {...marked[key], selected: false}));
-        newMarked[dateString] = {...newMarked[dateString], selected: true}
+        newMarked[dateString] = {...newMarked[dateString], selected: true, selectedColor: colors.primary}
         setMarked({...newMarked});
-        const datePosition = games.findIndex((item) => item.date === dateString);
+        const datePosition = games.findIndex((item) => item.dateString === dateString);
         if (datePosition !== -1) {
             scrollView.current?.scrollTo({x: datePosition*350 - 10});
         }
@@ -83,26 +78,35 @@ export default function UpcomingGames({ navigation }) {
         const dateInViewIndex = Math.round(scrollPosition/350)
         let dateInView = games[dateInViewIndex]
         if (dateInView) {
-            selectDate(dateInView.date)
-            setCurrent(dateInView.date)
+            selectDate(dateInView.dateString)
+            setCurrent(dateInView.dateString)
         }
     }
 
     let UpcomingGameListItem = ({item, navigation}) => {
-        let moment = Moment(item.date)
-
         return (
             <Pressable onPress={() => navigation.navigate('Game', {game: item})} key={item.ID}>
                 <View style={globalStyles.calenderItem}>
-                    <View style={{flexDirection: "column", flex: 1}}>
-                        <Text style={{flex: 1}}>{item.fieldName}</Text>
-                        <Text style={{flex: 1}}>{moment.format('MMMM Do [at] h:mm')}</Text>
+                    <View style={{flexDirection: "column", flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                        {dateBubble(item.moment)}
                     </View>
-                    <View style={{flex: 1, textAlign:'right', justifyContent: 'center'}}>
-                        <Text>{`${item.home} vs ${item.away}`}</Text>
+                    <View style={{flex: 2, textAlign:'right', justifyContent: 'center'}}>
+                        <Text style={styles.calenderItemTime}>{item.moment.format('h:mm:ss A')}</Text>
+                        <Text style={styles.text}>{`${item.home} vs ${item.away}`}</Text>
+                        <Text style={styles.text}>{item.fieldName}</Text>
                     </View>
                 </View>
             </Pressable>
+        )
+    }
+
+
+    let dateBubble = (moment) => {
+        return (
+            <View style={styles.dateBubbleContainer}>
+                <Text style={styles.dateBubbleDay}>{moment.date()}</Text>
+                <Text style={styles.dateBubbleMonth}>{moment.format('MMM')}</Text>
+            </View>
         )
     }
 

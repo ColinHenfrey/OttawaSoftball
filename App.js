@@ -10,7 +10,7 @@ import HomeNav from "./screens/HomeNav";
 import Inning from "./screens/Inning";
 import BattingOrder from "./screens/BattingOrder";
 import { SafeAreaView } from "react-native";
-import styles from "./styles";
+import styles from "./styles/styles";
 import {View} from "react-native";
 import InningTest from "./screens/InningTest";
 import Game from "./screens/Game";
