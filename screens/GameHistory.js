@@ -11,7 +11,8 @@ export default function GameHistory({navigation}) {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
-            await fetchGames().then(games => setGames(games));
+            const now = moment();
+            await fetchGames().then(games => setGames(games.filter(game => moment(game.date) < now)));
         });
 
         return unsubscribe;

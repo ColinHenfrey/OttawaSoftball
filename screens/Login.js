@@ -1,7 +1,11 @@
-import {Button, TextInput, View, Text} from "react-native";
+import {TouchableOpacity, View} from "react-native";
 import styles from "../styles/styles";
 import {useContext, useState} from "react";
 import UserContext from "../context/UserContext";
+import TextInput from '../styledComponents/TextInput'
+import Button from '../styledComponents/Button'
+import Text from '../styledComponents/Text'
+import TextButton from "../styledComponents/TextButton";
 
 export default function Login({ navigation }) {
     const [email, onChangeEmail] = useState(null);
@@ -31,7 +35,7 @@ export default function Login({ navigation }) {
               }
             })
             .catch(err => {
-              console.log(err);
+              console.log(err['message']);
               setMessage(err.message)
             });
         if (response?.userID) {
@@ -43,23 +47,23 @@ export default function Login({ navigation }) {
     }
 
     return (
-      <View style={styles.container}>
+      <View style={{...styles.container, justifyContent: 'flex-start'}}>
+          <Text style={styles.title}>Welcome to Ottawa Softball</Text>
+          <Text>Login below or create an account</Text>
         <TextInput
-            style={styles.input}
             onChangeText={onChangeEmail}
             value={email}
             placeholder={"Username"}
         />
         <TextInput
-            style={styles.input}
             onChangeText={onChangePassword}
             value={password}
             placeholder={"Password"}
             secureTextEntry={true}
         />
           {message && <Text style={styles.error}>{message}</Text>}
-        <Button onPress= {login} title={'Login'}/>
-        <Button title='Create account' onPress={() => navigation.navigate('Create Account')}/>
+        <Button onPress= {login} title={'Login'} />
+        <TextButton title='Create account' onPress={() => navigation.navigate('Create Account')}/>
       </View>
     );
 }

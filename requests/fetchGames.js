@@ -15,7 +15,7 @@ export default async () => {
                 console.log(err);
             });
         const now = moment()
-        return response?.games.filter(game => moment(game.date) < now).map((game) => {
+        return response?.games.map((game) => {
             const date = moment(game.date)
             game.dateString = date.format('YYYY-MM-DD');
             game.moment = date;

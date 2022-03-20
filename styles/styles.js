@@ -4,9 +4,10 @@ import colors from "../colors"
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+        // borderWidth: 2,
+        // borderColor: 'red'
     },
     input: {
         height: 40,
@@ -65,5 +66,14 @@ export default StyleSheet.create({
     dateBubbleMonth: {
         fontSize: 15,
         padding:0
+    },
+    teamLogo: {
+        borderRadius: 100,
+        backgroundColor: colors.primary,
+        justifyContent: "center",
+        alignItems: "center",
+        width: 100,
+        height: 100,
+        color: colors.white
     }
 });
