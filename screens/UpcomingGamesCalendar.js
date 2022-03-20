@@ -42,29 +42,31 @@ export default function UpcomingGamesCalendar({ navigation }) {
         selectDate(day.dateString)
     }
 
-    let selectDate = (dateString) => {
+    let selectDate = (dateString, datePosition) => {
         let newMarked = {};
         Object.keys(marked).forEach(key => (newMarked[key] = {...marked[key], selected: false}));
         newMarked[dateString] = {...newMarked[dateString], selected: true, selectedColor: colors.primary}
         setMarked({...newMarked});
-        const datePosition = games.findIndex((item) => item.dateString === dateString);
+        if (!datePosition) {
+            datePosition = games.findIndex((item) => item.dateString === dateString);
+        }
         if (datePosition !== -1) {
             scrollView.current?.scrollTo({x: datePosition*355});
         }
     }
 
-    // need to only do this on snap ideally
     let handleScroll = (event) => {
         const scrollPosition = event.nativeEvent.contentOffset.x
         const currentDateInView = Math.round(scrollPosition / 350)
-        if (dateInViewIndex !== currentDateInView) {
+        let dateInView = games[currentDateInView]
+        if (currentDateInView !== dateInViewIndex) {
             setDateInViewIndex(currentDateInView)
-            console.log("momentum scroll end on " + currentDateInView)
-            let dateInView = games[currentDateInView]
             if (dateInView) {
-                selectDate(dateInView.dateString)
+                selectDate(dateInView.dateString, currentDateInView)
                 setCurrent(dateInView.dateString)
             }
+        } else {
+            //Do nothing for now
         }
     }
 
@@ -89,7 +91,6 @@ export default function UpcomingGamesCalendar({ navigation }) {
                     decelerationRate={'fast'}
                     onMomentumScrollEnd={handleScroll}
                     horizontal= {true}
-                    pagingEnabled = {true}
                     snapToAlignment={"center"}
                     contentInset={{
                         top: 0,
