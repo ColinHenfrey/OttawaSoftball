@@ -10,51 +10,20 @@ import styles from "../styles/styles";
 import colors from "../colors";
 import Text from "../styledComponents/Text"
 import UpcomingGameListItem from "./UpcomingGamesListItem";
+import fetchGames from "../requests/fetchGames";
 
 export default function UpcomingGamesList({ navigation }) {
     const { userID, setUserID } = useContext(UserContext);
     const [ games, setGames ] = useState([]);
-    const [items, setItems] = useState({});
-    const [marked, setMarked] = useState({});
-    const [current, setCurrent] = useState(null);
 
-    useEffect(async () => {
-        await getGames()
-    }, [])
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            await fetchGames().then(games => setGames(games));
+        });
 
-    const getGames = async () => {
-        try {
-            const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/games?teamID=' + 1)
-                .then(res => {
-                if(!res.ok) {
-                    return res.text().then(text => { throw new Error(text) })
-                }
-                else {
-                    return res.json();
-                }
-            })
-                .catch(err => {
-                    console.log(err);
-                });
-            const newItems = {};
-            const newMarked = {};
-            setGames(response?.games.map((game) => {
-                const date = moment(game.date)
-                game.dateString = date.format('YYYY-MM-DD');
-                game.moment = date;
-                return game;
-            }));
-            response?.games.forEach(game => {
-                let dateString = moment(game.date).format('YYYY-MM-DD')
-                newItems[dateString] = [game]
-                newMarked[dateString] = {disabled: false, marked: true, dotColor: colors.primary}
-            });
-            setItems(newItems);
-            setMarked(newMarked);
-        } catch (error) {
-            console.error(error);
-        }
-    }
+        return unsubscribe;
+    }, [navigation]);
+
 
     return (
         <View style={{flex: 1, alignItems: 'center'}}>
