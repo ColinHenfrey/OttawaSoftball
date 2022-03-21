@@ -13,7 +13,7 @@ import UpcomingGameListItem from "./UpcomingGamesListItem";
 import fetchGames from "../requests/fetchGames";
 
 export default function UpcomingGamesCalendar({ navigation }) {
-    const { userID, setUserID } = useContext(UserContext);
+    const { userInfo } = useContext(UserContext);
     const [ games, setGames ] = useState([]);
     const [marked, setMarked] = useState({});
     const [current, setCurrent] = useState(null);
@@ -21,28 +21,23 @@ export default function UpcomingGamesCalendar({ navigation }) {
     const scrollView = useRef(null);
 
     useEffect(async () => {
-        await getGames()
+        await fetchGames(userInfo.userID).then(games => setGames(games))
     }, [])
 
-    const getGames = async () => {
-        try {
-            await fetchGames().then(games => setGames(games))
-            const newMarked = {};
-            games.forEach(game => {
-                let dateString = moment(game.date).format('YYYY-MM-DD')
-                newMarked[dateString] = {disabled: false, marked: true, dotColor: colors.primary}
-            });
-            setMarked(newMarked);
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    useEffect(async () => {
+        const newMarked = {};
+        games.forEach(game => {
+            let dateString = moment(game.date).format('YYYY-MM-DD')
+            newMarked[dateString] = {disabled: false, marked: true, dotColor: colors.primary}
+        });
+        setMarked(newMarked);
+    }, [games])
 
     let updateSelectedDay = (day) => {
-        selectDate(day.dateString)
+        selectDate(day.dateString, null, true)
     }
 
-    let selectDate = (dateString, datePosition) => {
+    let selectDate = (dateString, datePosition, snap) => {
         let newMarked = {};
         Object.keys(marked).forEach(key => (newMarked[key] = {...marked[key], selected: false}));
         newMarked[dateString] = {...newMarked[dateString], selected: true, selectedColor: colors.primary}
@@ -50,19 +45,19 @@ export default function UpcomingGamesCalendar({ navigation }) {
         if (!datePosition) {
             datePosition = games.findIndex((item) => item.dateString === dateString);
         }
-        if (datePosition !== -1) {
+        if (datePosition !== -1 && snap) {
             scrollView.current?.scrollTo({x: datePosition*355});
         }
     }
 
-    let handleScroll = (event) => {
+    let handleMomentumEnd = (event, snap) => {
         const scrollPosition = event.nativeEvent.contentOffset.x
         const currentDateInView = Math.round(scrollPosition / 350)
         let dateInView = games[currentDateInView]
         if (currentDateInView !== dateInViewIndex) {
             setDateInViewIndex(currentDateInView)
             if (dateInView) {
-                selectDate(dateInView.dateString, currentDateInView)
+                selectDate(dateInView.dateString, currentDateInView, snap)
                 setCurrent(dateInView.dateString)
             }
         } else {
@@ -89,7 +84,8 @@ export default function UpcomingGamesCalendar({ navigation }) {
                 <ScrollView
                     ref={scrollView}
                     decelerationRate={'fast'}
-                    onMomentumScrollEnd={handleScroll}
+                    onMomentumScrollEnd={(event) => handleMomentumEnd(event, true)}
+                    onScrollEndDrag={handleMomentumEnd}
                     horizontal= {true}
                     snapToAlignment={"center"}
                     contentInset={{
@@ -99,9 +95,8 @@ export default function UpcomingGamesCalendar({ navigation }) {
                         right: 30,
                     }}
                 >
-                    {games.map((item) => UpcomingGameListItem({item, navigation}))}
+                    {games?.map((item) => UpcomingGameListItem({item, navigation}))}
                 </ScrollView>
-                <Button title='Logout' onPress={() => setUserID('')}/>
             </View>
         </View>
     )

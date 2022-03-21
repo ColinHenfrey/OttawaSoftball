@@ -12,34 +12,34 @@ import styles from "./styles/styles";
 import {SafeAreaView, View} from "react-native";
 import InningTest from "./screens/InningTest";
 import Game from "./screens/Game";
-import UpcomingGames from "./screens/UpcomingGames";
+import HomeTabNav from "./screens/HomeTabNav";
 import HomeStack from "./screens/HomeStack";
 import GameHistory from "./screens/GameHistory";
 
 export default function App() {
 
-    const [userID, setUserID] = useState('');
+    const [userInfo, setUserInfo] = useState('');
     const value = useMemo(
-        () => ({ userID, setUserID }),
-        [userID]
+        () => ({ userInfo, setUserInfo }),
+        [userInfo]
     );
 
     useEffect(async () => {
-        let userID = await AsyncStorage.getItem('userID')
-        setUserID(!userID || userID.includes("\\") ? '' : JSON.parse(userID))
+        let userInfo = await AsyncStorage.getItem('userInfo')
+        setUserInfo(!userInfo || userInfo.includes("\\") ? '' : JSON.parse(userInfo))
     }, []);
 
 
     useEffect( () => {
-        AsyncStorage.setItem('userID', JSON.stringify(userID))
-        console.log('Set user ID to ' + userID)
-    }, [userID] )
+        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo))
+        console.log('Set user ID to ' + JSON.stringify(userInfo))
+    }, [userInfo] )
 
 
     return (
         <UserContext.Provider value={value}>
             <NavigationContainer>
-                {(!userID || userID === '' || userID === "\"\"") ? <LoginNav /> : <HomeStack/>}
+                {(!userInfo?.userID || userInfo.userID === '' || userInfo.userID === "\"\"") ? <LoginNav /> : <HomeStack/>}
                 {/*<GameHistory />*/}
                 <StatusBar/>
             </NavigationContainer>

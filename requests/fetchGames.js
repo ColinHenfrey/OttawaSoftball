@@ -1,8 +1,8 @@
 import moment from "moment";
 
-export default async () => {
+export default async (userID) => {
     try {
-        const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/games?teamID=' + 1)
+        const response = await fetch('http://ottawasoftball.us-east-1.elasticbeanstalk.com/games?userID=' + userID)
             .then(res => {
                 if(!res.ok) {
                     return res.text().then(text => { throw new Error(text) })
@@ -15,7 +15,7 @@ export default async () => {
                 console.log(err);
             });
         const now = moment()
-        return response?.games.map((game) => {
+        return response?.games?.map((game) => {
             const date = moment(game.date)
             game.dateString = date.format('YYYY-MM-DD');
             game.moment = date;

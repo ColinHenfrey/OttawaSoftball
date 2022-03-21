@@ -3,8 +3,9 @@ import UpcomingGamesList from "./UpcomingGamesList";
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import UpcomingGamesCalendar from "./UpcomingGamesCalendar";
 import GameHistory from "./GameHistory";
+import Settings from "./Settings";
 
-export default function UpcomingGames() {
+export default function HomeTabNav() {
 
     const Tab = createBottomTabNavigator();
 
@@ -31,6 +32,14 @@ export default function UpcomingGames() {
                     <MaterialIcons name="history" size={24} color="black" />
                 ),
                 headerTitle: 'Game History'
+            }}/>
+
+            <Tab.Screen name="Settings" component={Settings} options={{
+                tabBarLabel: 'Settings',
+                tabBarIcon: ({ color, size }) => (
+                    <Feather name="settings" size={24} color="black" />
+                ),
+                headerTitle: 'Settings'
             }}/>
         </Tab.Navigator>
     )

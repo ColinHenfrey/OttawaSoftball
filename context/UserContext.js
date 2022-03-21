@@ -1,6 +1,6 @@
 import {createContext} from "react";
 
 export default createContext({
-    userID: '',
-    setUserID: () => {}
+    userInfo: '',
+    setUserInfo: () => {}
 });

@@ -11,7 +11,7 @@ export default function Login({ navigation }) {
     const [email, onChangeEmail] = useState(null);
     const [password, onChangePassword] = useState(null);
     const [message, setMessage] = useState(null);
-    const { setUserID } = useContext(UserContext);
+    const { userInfo, setUserInfo } = useContext(UserContext);
 
     const login = async () => {
       try {
@@ -39,8 +39,10 @@ export default function Login({ navigation }) {
               setMessage(err.message)
             });
         if (response?.userID) {
-            setUserID(JSON.stringify(response.userID))
+            console.log(response)
+            setUserInfo({...userInfo, userID: JSON.stringify(response?.userID)})
         }
+          console.log(response)
       } catch (error) {
         console.error(error);
       }

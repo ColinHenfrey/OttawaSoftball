@@ -13,12 +13,12 @@ import UpcomingGameListItem from "./UpcomingGamesListItem";
 import fetchGames from "../requests/fetchGames";
 
 export default function UpcomingGamesList({ navigation }) {
-    const { userID, setUserID } = useContext(UserContext);
+    const { userInfo, setUserInfo } = useContext(UserContext);
     const [ games, setGames ] = useState([]);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
-            await fetchGames().then(games => setGames(games));
+            await fetchGames(userInfo.userID).then(games => setGames(games));
         });
 
         return unsubscribe;
@@ -30,7 +30,6 @@ export default function UpcomingGamesList({ navigation }) {
             <ScrollView style={{flex: 1}}>
                 {games.map((item) => UpcomingGameListItem({item, navigation}))}
             </ScrollView>
-            <Button title='Logout' onPress={() => setUserID('')}/>
         </View>
     )
 }

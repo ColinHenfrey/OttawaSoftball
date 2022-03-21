@@ -9,7 +9,7 @@ export default function CreateAccount() {
     const [confirmPassword, onChangeConfirmPassword] = useState(null);
     const [firstName, onChangeFirstName] = useState(null);
     const [lastName, onChangeLastName] = useState(null);
-    const { setUserID } = useContext(UserContext);
+    const { userInfo, setUserInfo } = useContext(UserContext);
 
     const createAccount = async () => {
         try {
@@ -37,7 +37,7 @@ export default function CreateAccount() {
                     console.log(err);
                 });
             console.log(response.userID)
-            setUserID(JSON.stringify(response.userID))
+            setUserInfo({...userInfo, userID: JSON.stringify(response.userID)})
         } catch (error) {
             console.error(error);
         }
