@@ -11,6 +11,7 @@ import colors from "../colors";
 import Text from "../styledComponents/Text"
 import UpcomingGameListItem from "./UpcomingGamesListItem";
 import fetchGames from "../requests/fetchGames";
+import TextButton from "../styledComponents/TextButton";
 
 export default function UpcomingGamesCalendar({ navigation }) {
     const { userInfo } = useContext(UserContext);
@@ -78,9 +79,19 @@ export default function UpcomingGamesCalendar({ navigation }) {
             </View>
 
             <View style={{flex: 1}}>
-                <Text style={styles.title}>
-                    Upcoming Games
-                </Text>
+                <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                        <Text style={{...styles.title, textAlign: 'left'}}>
+                            Upcoming Games
+                        </Text>
+                    </View>
+                    <View style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
+                        <TextButton
+                            textStyle={{fontSize: 20, marginRight: 10}}
+                            title="See All" onPress={() => navigation.navigate("UpcomingGamesList")}
+                        />
+                    </View>
+                </View>
                 <ScrollView
                     ref={scrollView}
                     decelerationRate={'fast'}

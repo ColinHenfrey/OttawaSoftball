@@ -18,13 +18,6 @@ export default function HomeTabNav() {
                 ),
                 headerTitle: 'Upcoming Games'
             }}/>
-            <Tab.Screen name="GamesList" component={UpcomingGamesList} options={{
-                tabBarLabel: 'List',
-                tabBarIcon: ({ color, size }) => (
-                    <Feather name="list" size={24} color="black" />
-                ),
-                headerTitle: 'Upcoming Games'
-            }}/>
 
             <Tab.Screen name="GameHistory" component={GameHistory} options={{
                 tabBarLabel: 'History',
