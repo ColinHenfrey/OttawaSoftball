@@ -24,6 +24,3 @@ export default function HomeStack() {
         </Stack.Navigator>
     )
 }
-
-// Hiding the header for now on Inning because it was causing issues with the player dragging   `
-// options={{headerShown: false}}
