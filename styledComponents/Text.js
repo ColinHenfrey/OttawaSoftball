@@ -2,6 +2,6 @@ import { Text } from 'react-native';
 import globalStyles from "../styles/globalStyles";
 
 export default (props) => (
-        <Text {...props} style={{...globalStyles.text, ...props.style}}>{props.children}</Text>
+        <Text {...props} defaultProps={{...Text.defaultProps, maxFontSizeMultiplier: 1}} style={{...globalStyles.text, ...props.style}}>{props.children}</Text>
     );
 

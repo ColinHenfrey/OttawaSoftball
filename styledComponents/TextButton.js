@@ -3,7 +3,9 @@ import globalStyles from "../styles/globalStyles";
 
 export default (props) => (
     <TouchableOpacity {...props} style={{...globalStyles.textButton, ...props.style}}>
-        <Text style={{...globalStyles.textButtonText, ...props.textStyle}}>{props.title}</Text>
+        <Text defaultProps={{...Text.defaultProps, maxFontSizeMultiplier: 1}} style={{...globalStyles.textButtonText, ...props.textStyle}}>
+            {props.title}
+        </Text>
     </TouchableOpacity>
 );
 
