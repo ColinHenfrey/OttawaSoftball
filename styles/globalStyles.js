@@ -6,7 +6,8 @@ export default StyleSheet.create({
         color: colors.primaryText,
         padding: 2,
         fontSize: 16,
-        textAlign: 'center'
+        textAlign: 'center',
+        allowFontScaling: false
     },
     textInput: {
         backgroundColor: colors.light,
@@ -26,7 +27,8 @@ export default StyleSheet.create({
         margin: 4,
     },
     buttonText: {
-        color: colors.white
+        color: colors.white,
+        allowFontScaling: false
     },
     textButton: {
         color: colors.primaryText,
@@ -36,5 +38,6 @@ export default StyleSheet.create({
     textButtonText: {
         color: colors.primaryText,
         textDecorationLine: 'underline',
+        allowFontScaling: false
     }
 });
